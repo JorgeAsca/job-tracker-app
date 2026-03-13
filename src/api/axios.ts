@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'https://tracker-apasp.free.beeceptor.com', 
+  baseURL: 'https://tracker-ap.free.beeceptor.com', 
   headers: {
     'Content-Type': 'application/json',
   },
