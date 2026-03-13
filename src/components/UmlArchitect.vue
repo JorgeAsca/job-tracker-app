@@ -6,86 +6,120 @@ import '../assets/uml.css';
 
 // Configuración inicial de Mermaid
 onMounted(() => {
-    mermaid.initialize({ 
+    mermaid.initialize({
         startOnLoad: false,
-        theme: 'default'
+        theme: 'default',
+        securityLevel: 'loose',
+        flowchart: { useMaxWidth: true, htmlLabels: true }
     });
 });
 
-const prompt = ref('');
+const requerimiento = ref(''); 
 const diagramGenerated = ref(false);
 const isLoading = ref(false);
 const chartContainer = ref<HTMLElement | null>(null);
 
-// 1. Manejo del AbortController para cancelación
+// Manejo del AbortController para cumplimiento de Actividad 2.3
 let controller: AbortController | null = null;
 
-const generateDiagram = async () => {
-    if (!prompt.value) return;
+const generarDiagrama = async () => {
+    if (!requerimiento.value.trim()) return;
 
+    // Inicializar controlador para permitir cancelación inmediata
     controller = new AbortController();
     isLoading.value = true;
     diagramGenerated.value = false;
 
     try {
-        // 2. Petición con signal de cancelación 
         const response = await axios.post(
-            'https://api.groq.com/openai/v1/chat/completions', 
+            'https://api.groq.com/openai/v1/chat/completions',
             {
                 model: "llama-3.3-70b-versatile",
                 messages: [
-                    { 
-                        role: "system", 
-                        content: "Explica solo con sintaxis Mermaid. No uses bloques de código ni texto adicional."
-                    }, 
-                    { role: "user", content: `Crea un diagrama de: ${prompt.value}` }
+                    {
+                        role: "system",
+                        content: `Eres un generador estricto de diagramas Mermaid. 
+                        REGLAS CRÍTICAS:
+                        1. Responde ÚNICAMENTE con el código del diagrama (graph TD o graph LR).
+                        2. NO uses bloques de código con comillas (no use \`\`\`).
+                        3. NO incluyas introducciones ni despedidas.
+                        4. Usa etiquetas simples en los nodos (solo letras y números).
+                        5. Evita caracteres como | > < [ ] dentro de los textos de los nodos.`
+                    },
+                    {
+                        role: "user",
+                        content: `Genera un diagrama de flujo Mermaid para: ${requerimiento.value}`
+                    }
                 ]
             },
-            { 
-                signal: controller.signal, // Vinculación obligatoria para abortar 
-                headers: { 
-                    'Authorization': `Bearer ${import.meta.env.VITE_AI_API_KEY}`, // Uso de variables de entorno 
+            {
+                signal: controller.signal,
+                headers: {
+                    'Authorization': `Bearer ${import.meta.env.VITE_AI_API_KEY}`,
                     'Content-Type': 'application/json'
-                } 
+                }
             }
         );
 
-        const mermaidCode = response.data.choices[0].message.content;
-        await renderMermaid(mermaidCode);
+        let rawContent = response.data.choices[0].message.content;
+        
+        // LIMPIEZA AVANZADA: Eliminar bloques markdown y basura técnica
+        let cleanCode = rawContent
+            .replace(/```mermaid/gi, '')
+            .replace(/```/g, '')
+            .replace(/graph\s+(TD|LR|TB|BT)/gi, (match: string) => match.toUpperCase())
+            .trim();
+
+        // Si la IA devolvió texto antes del código, buscamos dónde empieza el gráfico
+        const graphStart = cleanCode.search(/graph\s/i);
+        if (graphStart !== -1) {
+            cleanCode = cleanCode.substring(graphStart);
+        }
+
+        await renderMermaid(cleanCode);
         diagramGenerated.value = true;
 
     } catch (error: any) {
         if (axios.isCancel(error)) {
-            alert("Generación cancelada por el usuario.");
+            console.warn("Petición abortada por el usuario");
         } else {
-            console.error("Error en la API de IA:", error);
+            console.error("Error en la conexión con la IA:", error);
+            if (chartContainer.value) {
+                chartContainer.value.innerHTML = `<p style="color:red">Error de conexión: ${error.message}</p>`;
+            }
         }
     } finally {
         isLoading.value = false;
     }
 };
 
-// 3. Función para abortar la petición en vuelo
 const cancelGeneration = () => {
     if (controller) {
-        controller.abort(); 
+        controller.abort();
     }
 };
 
 const renderMermaid = async (code: string) => {
-    if (chartContainer.value) {
-        chartContainer.value.innerHTML = ''; // Limpiar previo
-        try {
-            // Renderizado dinámico en el DOM 
-            const { svg } = await mermaid.render('mermaid-svg-id', code);
-            chartContainer.value.innerHTML = svg;
-        } catch (e) {
-            console.error("Error al renderizar Mermaid:", e);
-        }
+    if (!chartContainer.value) return;
+
+    chartContainer.value.innerHTML = ''; 
+
+    try {
+        // Generar un ID único para cada renderizado para evitar conflictos de caché de Mermaid
+        const uniqueId = `mermaid-svg-${Math.random().toString(36).substr(2, 9)}`;
+        const { svg } = await mermaid.render(uniqueId, code);
+        chartContainer.value.innerHTML = svg;
+    } catch (error) {
+        console.error("Error de sintaxis Mermaid:", error);
+        chartContainer.value.innerHTML = `
+            <div class="error-box">
+                <strong>Error de Sintaxis IA:</strong> El código generado no es válido.
+                <pre>${code.substring(0, 100)}...</pre>
+                <button onclick="window.location.reload()">Reintentar</button>
+            </div>`;
     }
 };
 
-// 4. Función de exportación a SVG 
 const downloadSVG = () => {
     if (!chartContainer.value) return;
     const svgElement = chartContainer.value.querySelector('svg');
@@ -98,7 +132,7 @@ const downloadSVG = () => {
 
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'diagrama-ia.svg';
+    link.download = 'arquitectura-ia.svg';
     link.click();
     URL.revokeObjectURL(url);
 };
@@ -107,33 +141,33 @@ const downloadSVG = () => {
 <template>
     <div class="section-card">
         <h2>AI-UML Architect - Generador de Diagramas</h2>
-        
+
         <div class="uml-controls">
-            <input 
-                v-model="prompt" 
-                placeholder="Ej: Sistema de login de usuario..." 
-                :disabled="isLoading" 
+            <textarea 
+                v-model="requerimiento" 
+                placeholder="Describe tu sistema (ej: Proceso de login con validación de email)..." 
+                :disabled="isLoading"
                 class="input-prompt"
-            />
-            
+            ></textarea>
+
             <div class="button-group">
-                <button @click="generateDiagram" class="btn-primary" :disabled="isLoading">
-                    {{ isLoading ? 'Procesando IA...' : 'Generar' }}
+                <button @click="generarDiagrama" class="btn-primary" :disabled="isLoading">
+                    {{ isLoading ? 'Analizando Requerimiento...' : 'Generar Diagrama' }}
                 </button>
 
                 <button v-if="isLoading" @click="cancelGeneration" class="btn-delete">
-                    Cancelar Generación [cite: 198]
+                    Cancelar Generación
                 </button>
             </div>
         </div>
 
         <div ref="chartContainer" class="mermaid-output">
-            <p v-if="!diagramGenerated && !isLoading">El diagrama aparecerá aquí...</p>
+            <p v-if="!diagramGenerated && !isLoading">Escribe un requerimiento para empezar.</p>
         </div>
 
         <div v-if="diagramGenerated" class="export-container">
             <button @click="downloadSVG" class="btn-export">
-                Descargar .svg [cite: 203]
+                Descargar Imagen (.svg)
             </button>
         </div>
     </div>

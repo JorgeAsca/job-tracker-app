@@ -19,17 +19,18 @@ const generateSprite = async () => {
     downloadPercent.value = 0;
 
     try {
-        const response = await api.post(
+        const response = await axios.post(
             'https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1.5',
-            { inputs: `pixel art sprite sheet, ${prompt.value}, horizontal layout, 4 frames` },
+            { inputs: `pixel art sprite sheet, ${prompt.value}, white background` },
             {
-                responseType: 'blob',
+                responseType: 'blob', 
                 headers: {
-                    'Authorization': `Bearer ${import.meta.env.VITE_HF_TOKEN}`
+                    'Authorization': `Bearer ${import.meta.env.VITE_HF_TOKEN}`,
+                    'x-use-cache': 'false'
                 },
-                onDownloadProgress: (progressEvent) => {
+                onDownloadProgress: (progressEvent) => { 
                     if (progressEvent.total) {
-                        downloadPercent.value = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        progress.value = Math.round((progressEvent.loaded * 100) / progressEvent.total);
                     }
                 }
             }
