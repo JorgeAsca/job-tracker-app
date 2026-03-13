@@ -20,8 +20,10 @@ export const useJobStore = defineStore('jobStore', {
             this.loading = true;
             try {
                 const response = await api.get('/jobs');
+                console.log("Datos recibidos de Beeceptor:", response.data); 
                 this.jobs = response.data;
             } catch (err) {
+                console.error("Error en la petición:", err);
                 this.error = 'Error al cargar las candidaturas';
             } finally {
                 this.loading = false;
