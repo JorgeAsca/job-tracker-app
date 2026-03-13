@@ -16,6 +16,9 @@ const chartContainer = ref<HTMLElement | null>(null);
 const isLoading = ref(false);
 const diagramGenerated = ref(false);
 
+// 1. Referencia para controlar la cancelación
+const abortController = ref<AbortController | null>(null);
+
 // Acceso a la API Key desde el .env
 const apiKey = import.meta.env.VITE_AI_API_KEY;
 
@@ -43,6 +46,9 @@ const generarDiagrama = async () => {
     isLoading.value = true;
     diagramGenerated.value = false;
 
+    // 2. Inicializamos el AbortController antes de la petición
+    abortController.value = new AbortController();
+
     try {
         const response = await axios.post(
             'https://api.groq.com/openai/v1/chat/completions',
@@ -55,29 +61,25 @@ const generarDiagrama = async () => {
             },
             {
                 headers: {
-                    'Authorization': `Bearer ${import.meta.env.VITE_AI_API_KEY}`,
+                    'Authorization': `Bearer ${apiKey}`,
                     'Content-Type': 'application/json'
-                }
+                },
+                // 3. Vinculamos la señal de cancelación
+                signal: abortController.value.signal
             }
         );
 
         let rawContent = response.data.choices[0].message.content;
 
-        // --- LIMPIEZA Y NORMALIZACIÓN ---
-        // 1. Quitamos bloques markdown
         let cleanCode = rawContent.replace(/```mermaid/gi, '').replace(/```/g, '').trim();
 
-        // 2. Buscamos el inicio del diagrama (ignorando basura previa)
         const startMatch = cleanCode.match(/(graph|sequenceDiagram|classDiagram|stateDiagram|erDiagram)/i);
         if (startMatch) {
             cleanCode = cleanCode.substring(startMatch.index);
 
-            // 3. NORMALIZACIÓN CRÍTICA: Mermaid necesita camelCase exacto
-            // Si empieza por 'sequence...', forzamos 'sequenceDiagram'
             if (cleanCode.toLowerCase().startsWith('sequencediagram')) {
                 cleanCode = cleanCode.replace(/^sequencediagram/i, 'sequenceDiagram');
             }
-            // Si empieza por 'graph', lo dejamos en minúsculas
             else if (cleanCode.toLowerCase().startsWith('graph')) {
                 cleanCode = cleanCode.replace(/^graph/i, 'graph');
             }
@@ -87,10 +89,41 @@ const generarDiagrama = async () => {
         diagramGenerated.value = true;
 
     } catch (error) {
-        console.error("Error:", error);
+        // 4. Manejamos el aviso de cancelación
+        if (axios.isCancel(error)) {
+            alert("Petición cancelada por el usuario.");
+        } else {
+            console.error("Error:", error);
+        }
     } finally {
         isLoading.value = false;
+        abortController.value = null; // Limpiamos el controlador
     }
+};
+
+// 5. Función para abortar la petición
+const cancelarGeneracion = () => {
+    if (abortController.value) {
+        abortController.value.abort();
+    }
+};
+
+// 6. Función para exportar el SVG
+const exportarDiagrama = () => {
+    if (!chartContainer.value) return;
+    
+    // Obtenemos el contenido SVG renderizado
+    const svgData = chartContainer.value.innerHTML;
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+    
+    const downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = `diagrama_uml_${Date.now()}.svg`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    URL.revokeObjectURL(url);
 };
 </script>
 
@@ -107,10 +140,18 @@ const generarDiagrama = async () => {
                     placeholder="Describe el proceso (ej: El usuario se registra, recibe un email y confirma su cuenta)..."
                     :disabled="isLoading"></textarea>
 
-                <button @click="generarDiagrama" :disabled="isLoading || !userInput.trim()" class="btn-generate">
-                    <span v-if="!isLoading">Generar Diagrama</span>
-                    <span v-else class="loader"></span>
-                </button>
+                <div class="actions-row">
+                    <button v-if="!isLoading" @click="generarDiagrama" :disabled="!userInput.trim()" class="btn-generate">
+                        Generar Diagrama
+                    </button>
+                    <button v-else @click="cancelarGeneracion" class="btn-cancel">
+                        Cancelar Generación
+                    </button>
+
+                    <button v-if="diagramGenerated" @click="exportarDiagrama" class="btn-export">
+                        Descargar SVG
+                    </button>
+                </div>
             </div>
 
             <section v-show="diagramGenerated" class="output-section">
