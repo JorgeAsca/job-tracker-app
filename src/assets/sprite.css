@@ -1,0 +1,35 @@
+/* Contenedor de la barra de progreso */
+.progress-container {
+  width: 100%;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  margin: 15px 0;
+  height: 20px;
+  overflow: hidden;
+}
+
+/* Barra de progreso dinámica */
+.progress-bar {
+  height: 100%;
+  background-color: #42b883;
+  transition: width 0.2s ease;
+}
+
+/* Contenedor del personaje animado */
+.sprite-display {
+  width: 128px; /* Tamaño de un fotograma (según la IA) */
+  height: 128px;
+  margin: 20px auto;
+  border: 1px solid #ddd;
+  background-repeat: no-repeat;
+  display: block;
+  /* La imagen y frames se inyectan por v-bind */
+  background-image: v-bind('spriteUrl'); 
+  animation: play-sprite 1s steps(v-bind('frames')) infinite;
+}
+
+/* Animación de la hoja de sprites */
+@keyframes play-sprite {
+  from { background-position: 0px; }
+  to { background-position: -512px; } /* Ajustar: ancho_frame * total_frames */
+}
