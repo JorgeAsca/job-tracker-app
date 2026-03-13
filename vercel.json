@@ -1,0 +1,12 @@
+{
+    "rewrites": [
+        {
+            "source": "/api-hf/(.*)",
+            "destination": "https://api-inference.huggingface.co/models/:1"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/"
+        }
+    ]
+}
