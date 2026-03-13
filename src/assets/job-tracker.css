@@ -1,48 +1,35 @@
 /* src/assets/job-tracker.css */
 
-/* Contenedor principal de secciones */
-.forge-container {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-}
-
-/* Estilo de Tarjeta (Formularios y Listas) */
-.forge-card {
+/* Contenedor principal estilo SpriteForge */
+.section-card {
   background: var(--clr-surface);
   padding: 2rem;
   border-radius: var(--radius-lg);
   border: 1px solid var(--clr-surface-light);
   box-shadow: var(--shadow-md);
   margin-bottom: 2rem;
+  color: var(--clr-text-main);
 }
 
-.forge-title {
+.section-card h3 {
   color: var(--clr-accent);
   margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-  font-weight: 600;
-  border-bottom: 2px solid var(--clr-surface-light);
-  padding-bottom: 0.5rem;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-/* Estilos de Formulario */
-.forge-form {
+/* Estilo del Formulario */
+.job-form {
   display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-  color: var(--clr-text-muted);
-}
-
-.forge-input {
-  width: 100%;
-  padding: 0.75rem 1rem;
+.job-form input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.8rem 1.2rem;
   background: var(--clr-bg);
   border: 1px solid var(--clr-surface-light);
   border-radius: 8px;
@@ -50,52 +37,75 @@
   transition: var(--transition);
 }
 
-.forge-input:focus {
+.job-form input:focus {
   outline: none;
   border-color: var(--clr-accent);
-  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.2);
 }
 
-/* Botones con estilo Forge */
-.forge-button {
+/* Botones */
+.btn-primary {
   background: var(--clr-accent);
   color: var(--clr-bg);
-  padding: 0.75rem 1.5rem;
+  padding: 0.8rem 1.5rem;
   border-radius: 8px;
   border: none;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: var(--transition);
 }
 
-.forge-button:hover {
+.btn-primary:hover {
   background: var(--clr-accent-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
-/* Estilos de la Lista de Jobs (Resultados) */
-.result-item {
-  background: var(--clr-bg);
-  border: 1px solid var(--clr-surface-light);
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.btn-delete {
+  background: transparent;
+  color: var(--clr-danger);
+  border: 1px solid var(--clr-danger);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
   transition: var(--transition);
 }
 
-.result-item:hover {
-  border-color: var(--clr-accent);
+.btn-delete:hover {
+  background: var(--clr-danger);
+  color: white;
 }
 
-.job-info h3 {
-  color: var(--clr-text-main);
-  font-size: 1.1rem;
+/* Estilo de la Tabla */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
 }
 
-.job-info p {
+th {
+  text-align: left;
   color: var(--clr-text-muted);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  padding: 1rem;
+  border-bottom: 1px solid var(--clr-surface-light);
+}
+
+td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Selectores dentro de la tabla */
+select {
+  background: var(--clr-bg);
+  color: var(--clr-text-main);
+  border: 1px solid var(--clr-surface-light);
+  padding: 0.4rem;
+  border-radius: 4px;
+  outline: none;
+}
+
+select:focus {
+  border-color: var(--clr-accent);
 }

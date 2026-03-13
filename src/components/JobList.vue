@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useJobStore } from '../stores/useJobStore';
-import "../assets/job-tracker.css"; 
 
 const jobStore = useJobStore();
 </script>
@@ -38,3 +37,7 @@ const jobStore = useJobStore();
         </table>
     </div>
 </template>
+
+<style scoped>
+@import "../assets/job-tracker.css";
+</style>
