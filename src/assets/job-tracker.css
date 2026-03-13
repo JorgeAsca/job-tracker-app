@@ -1,0 +1,101 @@
+/* src/assets/job-tracker.css */
+
+/* Contenedor principal de secciones */
+.forge-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Estilo de Tarjeta (Formularios y Listas) */
+.forge-card {
+  background: var(--clr-surface);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--clr-surface-light);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 2rem;
+}
+
+.forge-title {
+  color: var(--clr-accent);
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  border-bottom: 2px solid var(--clr-surface-light);
+  padding-bottom: 0.5rem;
+}
+
+/* Estilos de Formulario */
+.forge-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--clr-text-muted);
+}
+
+.forge-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--clr-bg);
+  border: 1px solid var(--clr-surface-light);
+  border-radius: 8px;
+  color: var(--clr-text-main);
+  transition: var(--transition);
+}
+
+.forge-input:focus {
+  outline: none;
+  border-color: var(--clr-accent);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+/* Botones con estilo Forge */
+.forge-button {
+  background: var(--clr-accent);
+  color: var(--clr-bg);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.forge-button:hover {
+  background: var(--clr-accent-hover);
+  transform: translateY(-1px);
+}
+
+/* Estilos de la Lista de Jobs (Resultados) */
+.result-item {
+  background: var(--clr-bg);
+  border: 1px solid var(--clr-surface-light);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: var(--transition);
+}
+
+.result-item:hover {
+  border-color: var(--clr-accent);
+}
+
+.job-info h3 {
+  color: var(--clr-text-main);
+  font-size: 1.1rem;
+}
+
+.job-info p {
+  color: var(--clr-text-muted);
+  font-size: 0.9rem;
+}

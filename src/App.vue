@@ -35,10 +35,10 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
+<!-- <style scoped>
 .section-container {
   margin-bottom: 40px;
   padding: 20px;
   border-bottom: 2px solid #eee;
 }
-</style>
+</style> -->

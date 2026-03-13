@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useJobStore } from '../stores/useJobStore';
+import "../assets/job-tracker.css";
+
 
 const jobStore = useJobStore();
 const empresa = ref('');
