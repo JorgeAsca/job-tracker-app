@@ -111,12 +111,12 @@ const cancelarGeneracion = () => {
 // 6. Función para exportar el SVG
 const exportarDiagrama = () => {
     if (!chartContainer.value) return;
-    
+
     // Obtenemos el contenido SVG renderizado
     const svgData = chartContainer.value.innerHTML;
     const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(svgBlob);
-    
+
     const downloadLink = document.createElement('a');
     downloadLink.href = url;
     downloadLink.download = `diagrama_uml_${Date.now()}.svg`;
@@ -141,7 +141,8 @@ const exportarDiagrama = () => {
                     :disabled="isLoading"></textarea>
 
                 <div class="actions-row">
-                    <button v-if="!isLoading" @click="generarDiagrama" :disabled="!userInput.trim()" class="btn-generate">
+                    <button v-if="!isLoading" @click="generarDiagrama" :disabled="!userInput.trim()"
+                        class="btn-generate">
                         Generar Diagrama
                     </button>
                     <button v-else @click="cancelarGeneracion" class="btn-cancel">

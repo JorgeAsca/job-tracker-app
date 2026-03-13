@@ -7,10 +7,10 @@ export default defineConfig({
     proxy: {
       // Definimos el prefijo que usaremos en el frontend
       '/hf-api': {
-        target: 'https://api-inference.huggingface.co', // Destino real de la IA
+        target: 'https://api-inference.huggingface.co', // Destino de la IA
         changeOrigin: true,
-        secure: false, // Útil si hay problemas con certificados en local
-        rewrite: (path) => path.replace(/^\/hf-api/, ''), // Eliminamos el prefijo al llegar al destino
+        secure: false, 
+        rewrite: (path) => path.replace(/^\/hf-api/, ''),
       }
     }
   }
