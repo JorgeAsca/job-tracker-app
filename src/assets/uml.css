@@ -1,33 +1,87 @@
-.actions-row {
+.uml-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.uml-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.input-section {
     display: flex;
-    gap: 12px;
-    margin-top: 15px;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-.btn-cancel {
-    background-color: #e74c3c;
+textarea {
+    width: 100%;
+    height: 120px;
+    padding: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    resize: vertical;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #42b883;
+}
+
+.btn-generate {
+    padding: 1rem 2rem;
+    background-color: #42b883;
     color: white;
-    padding: 10px 20px;
     border: none;
     border-radius: 8px;
     font-weight: bold;
     cursor: pointer;
+    transition: background 0.3s;
 }
 
-.btn-cancel:hover {
-    background-color: #c0392b;
+.btn-generate:disabled {
+    background-color: #a8dadc;
+    cursor: not-allowed;
 }
 
-.btn-export {
-    background-color: #34495e;
-    color: white;
-    padding: 10px 20px;
-    border: none;
+.output-section {
+    margin-top: 3rem;
+    animation: fadeIn 0.5s ease;
+}
+
+.card-diagram {
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    overflow-x: auto;
+}
+
+.mermaid-target {
+    display: flex;
+    justify-content: center;
+}
+
+.error-text {
+    color: #d63031;
+    background: #fab1a022;
+    padding: 1rem;
     border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
+    text-align: center;
 }
 
-.btn-export:hover {
-    background-color: #2c3e50;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

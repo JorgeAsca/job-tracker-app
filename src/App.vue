@@ -3,14 +3,14 @@ import { onMounted } from 'vue';
 import { useJobStore } from './stores/useJobStore';
 import JobForm from './components/JobForm.vue';
 import JobList from './components/JobList.vue';
-import UmlArchitect from './components/UmlArchitect.vue'; // Actividad 2 [cite: 192]
-import SpriteForge from './components/SpriteForge.vue'; // Actividad 3 [cite: 206]
+import UmlArchitect from './components/UmlArchitect.vue'; 
+import SpriteForge from './components/SpriteForge.vue'; 
 import './assets/styles.css';
 
 const jobStore = useJobStore();
 
 onMounted(() => {
-  jobStore.fetchJobs(); // Sincronización inicial [cite: 166, 188]
+  jobStore.fetchJobs();
 });
 </script>
 
