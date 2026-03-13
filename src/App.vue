@@ -3,23 +3,42 @@ import { onMounted } from 'vue';
 import { useJobStore } from './stores/useJobStore';
 import JobForm from './components/JobForm.vue';
 import JobList from './components/JobList.vue';
+import UmlArchitect from './components/UmlArchitect.vue'; // Actividad 2 [cite: 192]
+import SpriteForge from './components/SpriteForge.vue'; // Actividad 3 [cite: 206]
 import './assets/styles.css';
 
 const jobStore = useJobStore();
 
 onMounted(() => {
-  jobStore.fetchJobs();
+  jobStore.fetchJobs(); // Sincronización inicial [cite: 166, 188]
 });
 </script>
 
 <template>
   <div class="container">
     <header>
-      <h1>💼 Job Tracker Pro</h1>
-      <p>Gestión asíncrona de candidaturas (Vue 3 + TS)</p>
+      <h1>Gestor de Proyectos Asíncronos</h1>
     </header>
 
-    <JobForm />
-    <JobList />
+    <section class="section-container">
+      <JobForm />
+      <JobList />
+    </section>
+
+    <section class="section-container">
+      <UmlArchitect />
+    </section>
+
+    <section class="section-container">
+      <SpriteForge />
+    </section>
   </div>
 </template>
+
+<style scoped>
+.section-container {
+  margin-bottom: 40px;
+  padding: 20px;
+  border-bottom: 2px solid #eee;
+}
+</style>
