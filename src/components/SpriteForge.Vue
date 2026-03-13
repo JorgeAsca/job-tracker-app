@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import axios from 'axios'; // IMPORTANTE: Añade esta línea para las validaciones de error
-import api from '../api/axios'; 
+import axios from 'axios'; 
 import '../assets/sprite.css';
 
 const prompt = ref('');
@@ -20,14 +19,18 @@ const generateSprite = async () => {
     abortController.value = new AbortController();
 
     try {
-        const response = await api.post(
-            'https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1.5',
-            { inputs: `pixel art sprite sheet, ${prompt.value}, white background` },
+        // Hemos cambiado el modelo a stabilityai/stable-diffusion-2-1
+        const response = await axios.post(
+            '/hf-api/models/nerijs/pixel-art-xl',
+            { 
+                inputs: `pixel art sprite sheet, ${prompt.value}, white background, character sprites, 8-bit style` 
+            },
             {
                 responseType: 'blob', 
                 signal: abortController.value.signal,
                 headers: {
                     'Authorization': `Bearer ${import.meta.env.VITE_HF_TOKEN}`,
+                    'Content-Type': 'application/json'
                 },
                 onDownloadProgress: (progressEvent) => {
                     if (progressEvent.total) {
@@ -40,12 +43,12 @@ const generateSprite = async () => {
         imageUrl.value = URL.createObjectURL(response.data);
         
     } catch (error: any) {
-        // CORRECCIÓN: Usamos axios.isCancel para que la referencia esté definida
-        if (axios.isCancel(error) || error.name === 'AbortError') {
-            alert("Generación de sprite cancelada por el usuario.");
+        if (axios.isCancel(error)) {
+            alert("Generación cancelada por el usuario.");
         } else {
-            console.error("Error con Hugging Face:", error);
-            alert("Error al conectar con Hugging Face. Revisa el token en tu .env");
+            console.error("Error en SpriteForge:", error);
+            // Si sale 404 o 410, es que el modelo no acepta inferencia gratuita ahora mismo
+            alert("Error al conectar con la IA. El modelo puede estar saturado o no disponible.");
         }
     } finally {
         isDownloading.value = false;
@@ -64,6 +67,50 @@ const downloadImage = () => {
     const link = document.createElement('a');
     link.href = imageUrl.value;
     link.download = `sprite-${Date.now()}.png`;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
 };
 </script>
+
+<template>
+    <div class="forge-container">
+        <header class="forge-header">
+            <h1>SpriteForge</h1>
+            <p>Crea tus personajes con IA</p>
+        </header>
+
+        <main class="forge-content">
+            <div class="input-section">
+                <input 
+                    v-model="prompt" 
+                    type="text" 
+                    placeholder="Ej: Guerrero de fuego, arquero elfo..."
+                    :disabled="isDownloading"
+                />
+                <div class="button-group">
+                    <button v-if="!isDownloading" @click="generateSprite" :disabled="!prompt.trim()" class="btn-forge">
+                        Forjar
+                    </button>
+                    <button v-else @click="cancelRequest" class="btn-cancel">
+                        Cancelar ({{ downloadPercent }}%)
+                    </button>
+                </div>
+            </div>
+
+            <div v-if="isDownloading" class="progress-wrapper">
+                <div class="progress-bar-container">
+                    <div class="progress-fill" :style="{ width: downloadPercent + '%' }"></div>
+                </div>
+                <p>Procesando imagen... {{ downloadPercent }}%</p>
+            </div>
+
+            <section v-if="imageUrl" class="result-section">
+                <div class="card-sprite">
+                    <img :src="imageUrl" alt="Sprite Generado" class="pixel-art-display" />
+                    <button @click="downloadImage" class="btn-download">Descargar</button>
+                </div>
+            </section>
+        </main>
+    </div>
+</template>
