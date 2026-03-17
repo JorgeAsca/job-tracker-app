@@ -17,7 +17,7 @@ onMounted(() => {
 <template>
   <div class="container">
     <header>
-      <h1>Gestor de Proyectos Asíncronos</h1>
+      <h1>Gestor de Proyecto Asíncronos</h1>
     </header>
 
     <section class="section-container">
